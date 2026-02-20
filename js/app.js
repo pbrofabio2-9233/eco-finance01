@@ -1,47 +1,62 @@
-let lancamentos = carregarDados();
+import { auth, db } from "./firebase.js";
+import { collection, addDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-function adicionarLancamento(){
+const incomeEl = document.getElementById("income");
+const expenseEl = document.getElementById("expense");
+const balanceEl = document.getElementById("balance");
+const list = document.getElementById("list");
 
-    const data = document.getElementById("data").value;
-    const descricao = document.getElementById("descricao").value;
-    const categoria = document.getElementById("categoria").value;
-    const tipo = document.getElementById("tipo").value;
-    const valor = parseFloat(document.getElementById("valor").value);
+const saveBtn = document.getElementById("save");
+const logoutBtn = document.getElementById("logout");
 
-    const novo = {
-        status: "OK",
-        data,
-        descricao,
-        categoria,
-        tipo,
-        valor
-    };
+let userId = null;
 
-    lancamentos.push(novo);
-    salvarDados(lancamentos);
-    atualizarTabela();
-}
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    userId = user.uid;
+    loadTransactions();
+  }
+});
 
-function atualizarTabela(){
-    const tabela = document.getElementById("tabelaLancamentos");
-    tabela.innerHTML = "";
+logoutBtn.onclick = () => signOut(auth);
 
-    lancamentos.forEach(l => {
-        tabela.innerHTML += `
-        <tr>
-            <td>${l.status}</td>
-            <td>${formatarData(l.data)}</td>
-            <td>${l.descricao}</td>
-            <td>${l.categoria}</td>
-            <td>${l.tipo}</td>
-            <td>R$ ${l.valor.toFixed(2)}</td>
-        </tr>`;
+saveBtn.onclick = async () => {
+  const desc = document.getElementById("desc").value;
+  const value = Number(document.getElementById("value").value);
+  const type = document.getElementById("type").value;
+
+  if (!desc || !value) return;
+
+  await addDoc(collection(db, "transactions"), {
+    userId,
+    desc,
+    value,
+    type,
+    date: new Date()
+  });
+};
+
+function loadTransactions() {
+  const q = query(collection(db, "transactions"), where("userId", "==", userId));
+
+  onSnapshot(q, snapshot => {
+    list.innerHTML = "";
+    let income = 0, expense = 0;
+
+    snapshot.forEach(doc => {
+      const t = doc.data();
+      const li = document.createElement("li");
+      li.innerText = `${t.desc} - R$ ${t.value}`;
+      list.appendChild(li);
+
+      t.type === "income" ? income += t.value : expense += t.value;
     });
-}
 
-function formatarData(data){
-    const d = new Date(data);
-    return d.toLocaleDateString("pt-BR");
+    incomeEl.innerText = income;
+    expenseEl.innerText = expense;
+    balanceEl.innerText = income - expense;
+  });
 }
-
-atualizarTabela();
