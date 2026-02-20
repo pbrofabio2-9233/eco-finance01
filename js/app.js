@@ -1,5 +1,4 @@
 import { db, auth } from "./storage.js";
-
 import {
   collection,
   addDoc,
@@ -12,8 +11,19 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-const saveBtn = document.getElementById("saveBtn");
 let currentUser = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const saveBtn = document.getElementById("saveBtn");
+
+  if (!saveBtn) {
+    console.error("Botão salvar não encontrado");
+    return;
+  }
+
+  saveBtn.addEventListener("click", saveTransaction);
+});
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -22,16 +32,21 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-saveBtn.addEventListener("click", async () => {
+async function saveTransaction() {
   if (!currentUser) {
     alert("Usuário não autenticado");
     return;
   }
 
-  const description = document.getElementById("description").value;
-  const value = Number(document.getElementById("value").value);
-  const type = document.getElementById("type").value;
-  const category = document.getElementById("category").value;
+  const description = document.getElementById("description")?.value;
+  const value = Number(document.getElementById("value")?.value);
+  const type = document.getElementById("type")?.value;
+  const category = document.getElementById("category")?.value;
+
+  if (!description || !value) {
+    alert("Preencha todos os campos");
+    return;
+  }
 
   await addDoc(
     collection(db, "users", currentUser.uid, "transactions"),
@@ -45,7 +60,7 @@ saveBtn.addEventListener("click", async () => {
   );
 
   alert("Transação salva com sucesso!");
-});
+}
 
 function loadTransactions() {
   const q = query(
