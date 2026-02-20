@@ -66,10 +66,6 @@
       cursor: pointer;
     }
 
-    #transactionsList {
-      margin-top: 15px;
-    }
-
     .transaction {
       display: flex;
       justify-content: space-between;
@@ -81,62 +77,64 @@
 
 <body>
 
-  <header>
-    <h2>Eco Finance</h2>
-    <p>Sistema de Gestão Financeira Pessoal</p>
-  </header>
+<header>
+  <h2>Eco Finance</h2>
+  <p>Gestão Financeira Pessoal</p>
+</header>
 
-  <!-- MENU -->
-  <nav>
-    <button>Dashboard</button>
-    <button>Transações</button>
-    <button>Relatórios</button>
-    <button id="logoutBtn">Sair</button>
-  </nav>
+<nav>
+  <button data-page="dashboard">Dashboard</button>
+  <button data-page="transactions">Transações</button>
+  <button data-page="reports">Relatórios</button>
+  <button id="logoutBtn">Sair</button>
+</nav>
 
-  <main>
+<main>
 
-    <!-- DASHBOARD -->
-    <section class="card">
-      <h3>Dashboard</h3>
-      <p>Total de transações cadastradas será exibido aqui.</p>
-    </section>
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="card">
+    <h3>Dashboard</h3>
+    <p id="summary">Nenhuma transação registrada.</p>
+  </section>
 
-    <!-- FORMULÁRIO -->
-    <section class="card">
-      <h3>Nova Transação</h3>
+  <!-- TRANSAÇÕES -->
+  <section id="transactions" class="card" style="display:none;">
+    <h3>Nova Transação</h3>
 
-      <div class="row">
-        <input id="description" type="text" placeholder="Descrição" />
-        <input id="value" type="number" placeholder="Valor" />
+    <div class="row">
+      <input id="description" placeholder="Descrição" />
+      <input id="value" type="number" placeholder="Valor" />
 
-        <select id="type">
-          <option value="entrada">Entrada</option>
-          <option value="saida">Saída</option>
-        </select>
+      <select id="type">
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
 
-        <select id="category">
-          <option value="geral">Geral</option>
-          <option value="alimentacao">Alimentação</option>
-          <option value="moradia">Moradia</option>
-          <option value="lazer">Lazer</option>
-        </select>
-      </div>
+      <select id="category">
+        <option value="geral">Geral</option>
+        <option value="alimentacao">Alimentação</option>
+        <option value="moradia">Moradia</option>
+        <option value="lazer">Lazer</option>
+      </select>
+    </div>
 
-      <br />
-      <button id="saveBtn" class="primary">Salvar</button>
-    </section>
+    <br />
+    <button id="saveBtn" class="primary">Salvar</button>
 
-    <!-- LISTAGEM -->
-    <section class="card">
-      <h3>Transações</h3>
-      <div id="transactionsList"></div>
-    </section>
+    <hr />
 
-  </main>
+    <h3>Transações Registradas</h3>
+    <div id="transactionsList"></div>
+  </section>
 
-  <!-- SCRIPT PRINCIPAL -->
-  <script type="module" src="./js/app.js"></script>
+  <!-- RELATÓRIOS -->
+  <section id="reports" class="card" style="display:none;">
+    <h3>Relatórios</h3>
+    <p>Em desenvolvimento...</p>
+  </section>
 
+</main>
+
+<script type="module" src="./js/app.js"></script>
 </body>
 </html>
