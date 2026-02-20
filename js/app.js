@@ -1,3 +1,4 @@
+console.log("app.js carregado");
 import { auth, db } from "./firebase.js";
 import { collection, addDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
