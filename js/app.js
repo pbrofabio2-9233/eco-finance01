@@ -63,12 +63,30 @@ async function saveTransaction() {
 }
 
 function loadTransactions() {
+  const list = document.getElementById("transactionsList");
+
   const q = query(
     collection(db, "users", currentUser.uid, "transactions"),
     orderBy("createdAt", "desc")
   );
 
   onSnapshot(q, (snapshot) => {
+    list.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+
+      const div = document.createElement("div");
+      div.className = "transaction";
+
+      div.innerHTML = `
+        <span>${data.description} (${data.category})</span>
+        <strong>${data.type === "entrada" ? "+" : "-"} R$ ${data.value}</strong>
+      `;
+
+      list.appendChild(div);
+    });
+
     console.log("Transações:", snapshot.size);
   });
 }
