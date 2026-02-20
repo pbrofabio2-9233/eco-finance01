@@ -1,236 +1,39 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Master Finance</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(180deg, #6a0dad, #4b0082);
-  color: #333;
-}
-
-header {
-  padding: 20px;
-  text-align: center;
-  color: #fff;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: #ffe0c2;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.flex {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-input, select, button {
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-}
-
-button {
-  cursor: pointer;
-  background: #6a0dad;
-  color: #fff;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  background: #fff;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.login {
-  text-align: center;
-  margin-top: 100px;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Master Finance</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<header>💰 Master Finance</header>
+<nav class="menu">
+  <h2>Master Finance</h2>
+  <button id="logout">Sair</button>
+</nav>
 
-<div id="login" class="login">
-  <button onclick="login()">Entrar com Google</button>
-</div>
+<section class="cards">
+  <div>Receitas: R$ <span id="income">0</span></div>
+  <div>Despesas: R$ <span id="expense">0</span></div>
+  <div>Saldo: R$ <span id="balance">0</span></div>
+</section>
 
-<div id="app" class="container" style="display:none">
+<section class="form">
+  <h3>Nova Transação</h3>
+  <input id="desc" placeholder="Descrição">
+  <input id="value" type="number" placeholder="Valor">
+  <select id="type">
+    <option value="income">Receita</option>
+    <option value="expense">Despesa</option>
+  </select>
+  <button id="save">Salvar</button>
+</section>
 
-  <div class="card flex">
-    <div>Receitas: <strong id="receitas">R$ 0</strong></div>
-    <div>Despesas: <strong id="despesas">R$ 0</strong></div>
-    <div>Saldo: <strong id="saldo">R$ 0</strong></div>
-  </div>
+<section>
+  <h3>Transações</h3>
+  <ul id="list"></ul>
+</section>
 
-  <div class="card">
-    <input type="month" id="filtroMes" />
-  </div>
-
-  <div class="card">
-    <canvas id="grafico"></canvas>
-  </div>
-
-  <div class="card">
-    <h3>Nova Transação</h3>
-    <div class="flex">
-      <input id="descricao" placeholder="Descrição" />
-      <input id="valor" type="number" placeholder="Valor" />
-      <select id="tipo">
-        <option value="receita">Receita</option>
-        <option value="despesa">Despesa</option>
-      </select>
-      <select id="categoria">
-        <option>Alimentação</option>
-        <option>Moradia</option>
-        <option>Transporte</option>
-        <option>Lazer</option>
-        <option>Outros</option>
-      </select>
-      <button onclick="salvar()">Salvar</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Transações</h3>
-    <ul id="lista"></ul>
-  </div>
-
-</div>
-
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAPEv9rP_Ek60NrGfMJnEO3dPzFM4j36cI",
-  authDomain: "master-finance-bce36.firebaseapp.com",
-  projectId: "master-finance-bce36",
-  storageBucket: "master-finance-bce36.firebasestorage.app",
-  messagingSenderId: "241893077182",
-  appId: "1:241893077182:web:b8100d0ca968ba90a42eef"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
-const provider = new GoogleAuthProvider();
-
-let usuario = null;
-let grafico = null;
-
-window.login = async () => {
-  await signInWithPopup(auth, provider);
-};
-
-onAuthStateChanged(auth, user => {
-  if (user) {
-    usuario = user;
-    document.getElementById("login").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    carregar();
-  }
-});
-
-function carregar() {
-  const q = query(
-    collection(db, "usuarios", usuario.uid, "transacoes")
-  );
-
-  onSnapshot(q, snapshot => {
-    let receitas = 0;
-    let despesas = 0;
-    let categorias = {};
-    const lista = document.getElementById("lista");
-    lista.innerHTML = "";
-
-    snapshot.forEach(docu => {
-      const d = docu.data();
-      if (d.tipo === "receita") receitas += d.valor;
-      else despesas += d.valor;
-
-      categorias[d.categoria] = (categorias[d.categoria] || 0) + d.valor;
-
-      const li = document.createElement("li");
-      li.innerHTML = `
-        ${d.descricao} - R$ ${d.valor}
-        <button onclick="excluir('${docu.id}')">🗑</button>
-      `;
-      lista.appendChild(li);
-    });
-
-    document.getElementById("receitas").innerText = `R$ ${receitas}`;
-    document.getElementById("despesas").innerText = `R$ ${despesas}`;
-    document.getElementById("saldo").innerText = `R$ ${receitas - despesas}`;
-
-    desenharGrafico(categorias);
-  });
-}
-
-window.salvar = async () => {
-  await addDoc(collection(db, "usuarios", usuario.uid, "transacoes"), {
-    descricao: descricao.value,
-    valor: Number(valor.value),
-    tipo: tipo.value,
-    categoria: categoria.value,
-    data: new Date()
-  });
-};
-
-window.excluir = async (id) => {
-  await deleteDoc(doc(db, "usuarios", usuario.uid, "transacoes", id));
-};
-
-function desenharGrafico(dados) {
-  const ctx = document.getElementById("grafico");
-  if (grafico) grafico.destroy();
-
-  grafico = new Chart(ctx, {
-    type: "pie",
-    data: {
-      labels: Object.keys(dados),
-      datasets: [{
-        data: Object.values(dados)
-      }]
-    }
-  });
-}
-</script>
-
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
