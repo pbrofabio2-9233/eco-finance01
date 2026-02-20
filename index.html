@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>EcoFinance - Sistema Financeiro</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h1>EcoFinance - Controle Financeiro</h1>
+
+<section class="form-section">
+    <h2>Novo Lançamento</h2>
+
+    <input type="date" id="data">
+    <input type="text" id="descricao" placeholder="Descrição">
+    
+    <select id="categoria">
+        <option>Moradia</option>
+        <option>Energia</option>
+        <option>Internet</option>
+        <option>Saúde</option>
+        <option>Alimentação</option>
+        <option>Transporte</option>
+        <option>Outros</option>
+    </select>
+
+    <select id="tipo">
+        <option value="receita">Receita</option>
+        <option value="despesa">Despesa</option>
+    </select>
+
+    <input type="number" id="valor" placeholder="Valor" step="0.01">
+
+    <button onclick="adicionarLancamento()">Adicionar</button>
+</section>
+
+<section>
+    <h2>Extrato</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody id="tabelaLancamentos"></tbody>
+    </table>
+</section>
+
+<a href="dashboard.html">Ir para Dashboard</a>
+
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
