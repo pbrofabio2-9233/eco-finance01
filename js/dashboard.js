@@ -4,9 +4,12 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 
 // SUA CONFIG DO FIREBASE AQUI
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  projectId: "SEU_PROJECT_ID",
+  apiKey: "AIzaSyAPEv9rP_Ek60NrGfMJnEO3dPzFM4j36cI",
+  authDomain: "master-finance-bce36.firebaseapp.com",
+  projectId: "master-finance-bce36",
+  storageBucket: "master-finance-bce36.firebasestorage.app",
+  messagingSenderId: "241893077182",
+  appId: "1:241893077182:web:b8100d0ca968ba90a42eef"
 };
 
 const app = initializeApp(firebaseConfig);
