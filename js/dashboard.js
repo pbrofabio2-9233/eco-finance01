@@ -1,17 +1,59 @@
-const dados = carregarDados();
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const receitas = dados.filter(d => d.tipo === "receita")
-                      .reduce((acc, d) => acc + d.valor, 0);
+// SUA CONFIG DO FIREBASE AQUI
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_AUTH_DOMAIN",
+  projectId: "SEU_PROJECT_ID",
+};
 
-const despesas = dados.filter(d => d.tipo === "despesa")
-                      .reduce((acc, d) => acc + d.valor, 0);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-new Chart(document.getElementById("graficoPizza"), {
-    type: 'pie',
-    data: {
-        labels: ["Receitas", "Despesas"],
-        datasets: [{
-            data: [receitas, despesas]
-        }]
+const totalReceitasEl = document.getElementById("totalReceitas");
+const totalDespesasEl = document.getElementById("totalDespesas");
+const saldoEl = document.getElementById("saldo");
+const listaEl = document.getElementById("listaTransacoes");
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert("Usuário não logado!");
+    return;
+  }
+
+  const transacoesRef = collection(db, "users", user.uid, "transacoes");
+  const snapshot = await getDocs(transacoesRef);
+
+  let totalReceitas = 0;
+  let totalDespesas = 0;
+
+  listaEl.innerHTML = "";
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+
+    if (data.tipo === "receita") {
+      totalReceitas += data.valor;
+    } else {
+      totalDespesas += data.valor;
     }
+
+    const li = document.createElement("li");
+    li.innerHTML = `
+      ${data.descricao} - R$ ${data.valor} 
+      <span class="${data.tipo === "receita" ? "receita" : "despesa"}">
+        (${data.tipo})
+      </span>
+    `;
+    listaEl.appendChild(li);
+  });
+
+  const saldo = totalReceitas - totalDespesas;
+
+  totalReceitasEl.innerText = "R$ " + totalReceitas.toFixed(2);
+  totalDespesasEl.innerText = "R$ " + totalDespesas.toFixed(2);
+  saldoEl.innerText = "R$ " + saldo.toFixed(2);
 });
