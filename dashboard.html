@@ -1,21 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Dashboard Financeiro</title>
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <title>Master Finance - Dashboard</title>
+  <style>
+    body { font-family: Arial; background: #111; color: white; padding: 20px; }
+    .card { background: #1e1e1e; padding: 20px; margin: 10px 0; border-radius: 8px; }
+    .receita { color: #00ff88; }
+    .despesa { color: #ff4d4d; }
+    .saldo { font-size: 22px; font-weight: bold; }
+  </style>
 </head>
 <body>
 
-<h1>Dashboard Executivo</h1>
+<h1>📊 Dashboard</h1>
 
-<canvas id="graficoPizza"></canvas>
-<canvas id="graficoLinha"></canvas>
+<div class="card">
+  <p>Receitas: <span id="totalReceitas" class="receita">R$ 0</span></p>
+  <p>Despesas: <span id="totalDespesas" class="despesa">R$ 0</span></p>
+  <p class="saldo">Saldo: <span id="saldo">R$ 0</span></p>
+</div>
 
-<a href="index.html">Voltar</a>
+<div class="card">
+  <h2>Transações</h2>
+  <ul id="listaTransacoes"></ul>
+</div>
 
-<script src="js/storage.js"></script>
-<script src="js/dashboard.js"></script>
+<script type="module" src="dashboard.js"></script>
+
 </body>
 </html>
